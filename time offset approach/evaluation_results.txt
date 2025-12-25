@@ -1,0 +1,168 @@
+Starting evaluation...
+
+Query: 3Drags_Dalal.m4a (GT = 3 DRAGS)
+Duration (sec): 33.79201814058957
+Sample rate: 22050
+  → CORRECT MATCH (3 DRAGS, votes=290)
+
+Query: highVolume03Drags.m4a (GT = 3 DRAGS)
+Duration (sec): 93.86666666666666
+Sample rate: 22050
+  → CORRECT MATCH (3 DRAGS, votes=4532)
+
+Query: lowVolume03Drags.m4a (GT = 3 DRAGS)
+Duration (sec): 62.78403628117914
+Sample rate: 22050
+  → CORRECT MATCH (3 DRAGS, votes=3142)
+
+Query: noisy03Drags.m4a (GT = 3 DRAGS)
+Duration (sec): 49.728027210884356
+Sample rate: 22050
+  → CORRECT MATCH (3 DRAGS, votes=356)
+
+Query: partial03Drags​.m4a (GT = 3 DRAGS)
+Duration (sec): 24.192018140589568
+Sample rate: 22050
+  → CORRECT MATCH (3 DRAGS, votes=1029)
+
+Query: highVolumeDhurandhar.m4a (GT = Dhurandar Title Track)     
+Duration (sec): 41.28
+Sample rate: 22050
+  → CORRECT MATCH (Dhurandar Title Track, votes=1713)
+
+Query: lowVolumeDhurandhar​.m4a (GT = Dhurandar Title Track)     
+Duration (sec): 45.03469387755102
+Sample rate: 22050
+  → CORRECT MATCH (Dhurandar Title Track, votes=1734)
+
+Query: noisyDhurandhar.m4a (GT = Dhurandar Title Track)
+Duration (sec): 37.54666666666667
+Sample rate: 22050
+  → CORRECT MATCH (Dhurandar Title Track, votes=232)
+
+Query: partialDhurandhar.m4a (GT = Dhurandar Title Track)        
+Duration (sec): 21.098684807256237
+Sample rate: 22050
+  → CORRECT MATCH (Dhurandar Title Track, votes=878)
+
+Query: noisyFasla.m4a (GT = Fasla)
+Duration (sec): 34.85868480725624
+Sample rate: 22050
+  → CORRECT MATCH (Fasla, votes=182)
+
+Query: concertKillaKlassic.mp3 (GT = Killa Klassic)
+Duration (sec): 132.12
+Sample rate: 22050
+  → CORRECT MATCH (Killa Klassic, votes=13)
+
+Query: killaKlassicLarge.m4a (GT = Killa Klassic)
+Duration (sec): 53.71736961451247
+Sample rate: 22050
+  → CORRECT MATCH (Killa Klassic, votes=895)
+
+Query: killaKlassicSmall.m4a (GT = Killa Klassic)
+Duration (sec): 15.829342403628118
+Sample rate: 22050
+  → CORRECT MATCH (Killa Klassic, votes=336)
+
+Query: lessNoiseKillaKlassic.m4a (GT = Killa Klassic)
+Duration (sec): 63.338684807256236
+Sample rate: 22050
+  → CORRECT MATCH (Killa Klassic, votes=2568)
+
+Query: lowVolumeKillaKlassic_.m4a (GT = Killa Klassic)
+Duration (sec): 21.76
+Sample rate: 22050
+  → CORRECT MATCH (Killa Klassic, votes=64)
+
+Query: lafangeyFull.mp3 (GT = Lafangey Parindey)
+Duration (sec): 205.31201814058957
+Sample rate: 22050
+  → CORRECT MATCH (Lafangey Parindey, votes=11194)
+
+Query: lowVolumeLafangeyParindey_.m4a (GT = Lafangey Parindey)   
+Duration (sec): 19.54136054421769
+Sample rate: 22050
+  → CORRECT MATCH (Lafangey Parindey, votes=562)
+
+Query: query1lafangey.m4a (GT = Lafangey Parindey)
+Duration (sec): 27.264036281179138
+Sample rate: 22050
+  → CORRECT MATCH (Lafangey Parindey, votes=1043)
+
+Query: query2LafangeyFull.m4a (GT = Lafangey Parindey)
+Duration (sec): 205.31201814058957
+Sample rate: 22050
+  → CORRECT MATCH (Lafangey Parindey, votes=11321)
+
+Query: highVolumeMaruti.m4a (GT = Maruti)
+Duration (sec): 40.59736961451247
+Sample rate: 22050
+  → CORRECT MATCH (Maruti, votes=1375)
+
+Query: lowVolumeMaruti​.m4a (GT = Maruti)
+Duration (sec): 33.6
+Sample rate: 22050
+  → CORRECT MATCH (Maruti, votes=1722)
+
+Query: noisyMaruti​.m4a (GT = Maruti)
+Duration (sec): 25.493333333333332
+Sample rate: 22050
+  → CORRECT MATCH (Maruti, votes=403)
+
+Query: partialMaruti.m4a (GT = Maruti)
+Duration (sec): 24.91736961451247
+Sample rate: 22050
+  → CORRECT MATCH (Maruti, votes=1004)
+
+Query: concertNarmahatFreestyle.mp3 (GT = Narmahat Freestyle)
+Duration (sec): 23.568027210884352
+Sample rate: 22050
+  → CORRECT MATCH (Narmahat Freestyle, votes=327)
+
+Query: narmahatLaptop.m4a (GT = Narmahat Freestyle)
+Duration (sec): 17.10934240362812
+Sample rate: 22050
+  → CORRECT MATCH (Narmahat Freestyle, votes=508)
+
+Query: highVolumeRed​.m4a (GT = RED)
+Duration (sec): 31.808027210884354
+Sample rate: 22050
+  → CORRECT MATCH (RED, votes=694)
+
+Query: lowVolumRed​.m4a (GT = RED)
+Duration (sec): 35.47736961451247
+Sample rate: 22050
+  → CORRECT MATCH (RED, votes=1835)
+
+Query: noisyRed​.m4a (GT = RED)
+Duration (sec): 26.709342403628117
+Sample rate: 22050
+  → CORRECT MATCH (RED, votes=255)
+
+Query: partialRed​.m4a (GT = RED)
+Duration (sec): 19.136009070294783
+Sample rate: 22050
+  → CORRECT MATCH (RED, votes=599)
+
+Query: highVolumeUchhalMat​.m4a (GT = Uchhal Matt)
+Duration (sec): 35.52
+Sample rate: 22050
+  → CORRECT MATCH (Uchhal Matt, votes=1516)
+
+Query: lowVolumeUchhalMat.m4a (GT = Uchhal Matt)
+Duration (sec): 29.141360544217687
+Sample rate: 22050
+  → CORRECT MATCH (Uchhal Matt, votes=1312)
+
+Query: noisyUchhalMat.m4a (GT = Uchhal Matt)
+Duration (sec): 32.448027210884355
+Sample rate: 22050
+  → CORRECT MATCH (Uchhal Matt, votes=208)
+
+========== FINAL RESULTS ==========
+Total queries     : 32
+True Positives    : 32
+False Positives   : 0
+False Negatives   : 0
+Accuracy          : 1.000
