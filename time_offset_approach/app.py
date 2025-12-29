@@ -52,27 +52,37 @@ async def identify(file: UploadFile = File(...)):
     }
 
 
+
 @app.post("/upload")
 async def upload_song(
     file: UploadFile = File(...),
-    song_id: str = Form(...)
+    song_title: str = Form(...),
+    artist_name: str = Form(...)
 ):
     """
     Upload a new song and index it into the fingerprint database.
 
-    This endpoint is meant for ADMIN / SYSTEM use, not end users.
+    artist_name is optional for backward compatibility.
     """
 
-
-    
+    #basic validations
     if not file.filename:
         raise HTTPException(status_code=400, detail="No audio file uploaded")
 
-    if not song_id.strip():
-        raise HTTPException(status_code=400, detail="song_id is required")
+    if not song_title.strip():
+        raise HTTPException(status_code=400, detail="song_title is required")
 
+    if not artist_name.strip():
+        raise HTTPException(status_code=400, detail="artist_name is required")
     
+    # Normalize values
+    song_title = song_title.strip()
+    artist_name = artist_name.strip() if artist_name else None
 
+    #unique id
+    song_id = song_title
+
+    #duplicate check
     existing_song = songs_col.find_one({ "song_id": song_id })
     if existing_song:
         raise HTTPException(
@@ -80,14 +90,12 @@ async def upload_song(
             detail="Song already exists in database"
         )
 
-
+    #saving uploaded file
     with tempfile.NamedTemporaryFile(delete=False, suffix=file.filename) as tmp:
         tmp_path = tmp.name
         tmp.write(await file.read())
 
-    
-
-    #convert to .wav
+    #to .wav
     wav_path = tmp_path + ".wav"
     subprocess.run(
         ["ffmpeg", "-y", "-i", tmp_path, wav_path],
@@ -95,13 +103,15 @@ async def upload_song(
         stderr=subprocess.DEVNULL
     )
 
-        #index the given song
+    #storing fingerprint!
     try:
         index_song(wav_path, song_id)
 
-        # store song metadata
+        # Store metadata (artist may be None)
         songs_col.insert_one({
-            "song_id": song_id
+            "song_id": song_id,
+            "title": song_title,
+            "artist": artist_name
         })
 
     finally:
@@ -109,8 +119,10 @@ async def upload_song(
         os.remove(tmp_path)
         os.remove(wav_path)
 
-    # return confirmation 
+    #response
     return {
         "status": "indexed",
-        "song_id": song_id
+        "song_id": song_id,
+        "title": song_title,
+        "artist": artist_name
     }
