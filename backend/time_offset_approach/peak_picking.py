@@ -1,5 +1,5 @@
 import numpy as np
-from .spectogram import plot_spectogram
+from spectogram import plot_spectogram
 
 
 def find_peaks(

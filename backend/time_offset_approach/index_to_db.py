@@ -1,7 +1,7 @@
 import os
-from .db import songs_col, fingerprints_col
-from ..core.landmark_generation import generate_landmarks
-from ..core.hashing import hash_landmark
+from db import songs_col, fingerprints_col
+from landmark_generation import generate_landmarks
+from hashing import hash_landmark
 
 # SONGS_DIR = "../chromaprint approach/known_songs"
 

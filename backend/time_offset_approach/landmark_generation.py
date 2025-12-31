@@ -1,4 +1,4 @@
-from .peak_picking import find_peaks
+from peak_picking import find_peaks
 
 def generate_landmarks(audio_path, fanout=5, max_dt=2.0):
     # print("Landmark generation started", flush=True)

@@ -3,10 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Form
 import tempfile, os, subprocess
 
-from time_offset_approach.db.match_from_db import identify_song
-from time_offset_approach.db.db import songs_col
-from time_offset_approach.db.index_to_db import index_song
-from time_offset_approach.integrations.spotify_search import search_spotify, parse_spotify_results
+from match_from_db import identify_song
+from db import songs_col
+from index_to_db import index_song
+from spotify_search import search_spotify, parse_spotify_results
 
 app = FastAPI()
 

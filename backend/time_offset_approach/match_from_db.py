@@ -1,7 +1,7 @@
 from collections import defaultdict
-from .db import fingerprints_col
-from ..core.landmark_generation import generate_landmarks
-from ..core.hashing import hash_landmark
+from db import fingerprints_col
+from landmark_generation import generate_landmarks
+from hashing import hash_landmark
 
 MAX_DB_MATCHES_PER_HASH = 50
 MIN_VOTES_TO_KEEP = 10
