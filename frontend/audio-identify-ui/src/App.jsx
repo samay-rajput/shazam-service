@@ -101,7 +101,7 @@ function App() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:8000/identify", {
+      const response = await fetch("https://shazam-service.onrender.com/identify", {
         method: "POST",
         body: formData,
       });
@@ -276,10 +276,10 @@ function App() {
                     <span style={styles.albumIcon}>💿</span>
                     {result.album_name}
                   </p>
-                  <div style={styles.metaChips}>
+                  {/* <div style={styles.metaChips}>
                     <span style={styles.metaChip}>HQ Match</span>
                     <span style={styles.metaChip}>10s Sample</span>
-                  </div>
+                  </div> */}
                 </div>
                 <a
                   href={result.spotify_url}
