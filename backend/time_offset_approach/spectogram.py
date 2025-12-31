@@ -1,5 +1,4 @@
 import librosa
-import librosa.display
 import numpy as np
 
 # Load one audio file
