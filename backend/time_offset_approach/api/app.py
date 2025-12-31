@@ -23,42 +23,72 @@ app.add_middleware(
 def health():
     return {"status": "ok"}
 
-
 @app.post("/identify")
 async def identify(file: UploadFile = File(...)):
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded")
 
-    # save uploaded file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=file.filename) as tmp:
-        tmp_path = tmp.name
-        tmp.write(await file.read())
+    MAX_FILE_SIZE = 8 * 1024 * 1024  # 8 MB hard limit
 
-    # convert to wav (important)
-    wav_path = tmp_path + ".wav"
-    subprocess.run(
-        ["ffmpeg", "-y", "-i", tmp_path, wav_path],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+
+    # read file with size limit
+    contents = await file.read()
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=413, detail="Audio file too large")
+
+    tmp_path = None
+    wav_path = None
 
     try:
-        id, votes, status = identify_song(wav_path)
-    finally:
-        os.remove(tmp_path)
-        os.remove(wav_path)
+        # save to /tmp explicitly (important on Render)
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=file.filename,
+            dir="/tmp"
+        ) as tmp:
+            tmp_path = tmp.name
+            tmp.write(contents)
 
-    #find the song with id in songs collection
-    song = songs_col.find_one({'song_id': str(id)},{'song_id': 0, '_id': 0})
+        # convert to small WAV (downsampled)
+        wav_path = tmp_path + ".wav"
+        subprocess.run(
+            [
+                "ffmpeg", "-y",
+                "-i", tmp_path,
+                "-ac", "1",        # mono
+                "-ar", "22050",    # downsample
+                wav_path
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True
+        )
+
+        # fingerprint & identify
+        song_id, votes, status = identify_song(wav_path)
+
+    finally:
+        # defensive cleanup (never crash here)
+        for p in (tmp_path, wav_path):
+            if p and os.path.exists(p):
+                try:
+                    os.remove(p)
+                except Exception:
+                    pass
+
+    # lookup song metadata
+    song = songs_col.find_one(
+        {"song_id": str(song_id)},
+        {"_id": 0, "song_id": 0}
+    )
 
     if song:
         return dict(song)
-    
-    return {
-        "status" : "No Match", 
-        "reason" : status
-    }
 
+    return {
+        "status": "No Match",
+        "reason": status
+    }
 
 
 @app.post("/upload")
@@ -104,14 +134,18 @@ async def upload_song(
         )
 
     #saving uploaded file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=file.filename) as tmp:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file.filename, dir="/tmp") as tmp:
+        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+        
+        if len(contents) > MAX_FILE_SIZE:
+            raise HTTPException(413, "File too large")
         tmp_path = tmp.name
         tmp.write(await file.read())
 
     #to .wav
     wav_path = tmp_path + ".wav"
     subprocess.run(
-        ["ffmpeg", "-y", "-i", tmp_path, wav_path],
+        ["ffmpeg", "-y", "-i", tmp_path, "-ac", "1", "-ar", "22050", wav_path],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
     )
@@ -133,8 +167,12 @@ async def upload_song(
 
     finally:
         #cleanup
-        os.remove(tmp_path)
-        os.remove(wav_path)
+        for p in (tmp_path, wav_path):
+            if p and os.path.exists(p):
+                try:
+                    os.remove(p)
+                except Exception:
+                    pass
 
     #response
     return {

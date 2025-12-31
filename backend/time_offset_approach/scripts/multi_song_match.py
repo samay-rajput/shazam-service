@@ -1,6 +1,6 @@
 import os
-from landmark_generation import generate_landmarks
-from matching import build_index, match_landmarks
+from time_offset_approach.core.landmark_generation import generate_landmarks
+from time_offset_approach.core.matching import build_index, match_landmarks
 
 # -------------------------------
 # CONFIG
