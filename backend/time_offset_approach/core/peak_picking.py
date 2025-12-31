@@ -1,5 +1,4 @@
 import numpy as np
-import librosa
 from .spectogram import plot_spectogram
 
 
@@ -18,7 +17,7 @@ def find_peaks(
 
     S_db, sr = plot_spectogram(audio_path)
 
-    #Numpy only
+    # Numpy only
     # A point is a peak if it is greater than all its neighbors
     # in a square neighborhood (approximation of maximum_filter)
 
@@ -36,14 +35,14 @@ def find_peaks(
                 pad + j : pad + j + S_db.shape[1]
             ]
 
-   #loudness thresholding
+    # loudness thresholding
     peaks_mask = local_max & (S_db > threshold_db)
 
-   #convert indices to time & freq
+    # convert indices to time & freq
     freq_idxs, time_idxs = np.where(peaks_mask)
 
-    times = librosa.frames_to_time(time_idxs, sr=sr, hop_length=hop_length)
-    freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)[freq_idxs]
+    times = (time_idxs * hop_length) / sr
+    freqs = (freq_idxs * sr) / n_fft
 
     # (time, freq)
     peaks = list(zip(times, freqs))
@@ -51,6 +50,5 @@ def find_peaks(
     return peaks
 
 
-
-if __name__ == "__main__": 
+if __name__ == "__main__":
     plot_spectogram("../chromaprint approach/evaluation/Killa Klassic/concertKillaKlassic.mp3")
