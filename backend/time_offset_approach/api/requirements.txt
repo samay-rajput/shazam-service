@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pymongo
+python-dotenv
+
+numpy
+scipy
+librosa
+soundfile
+soxr
+
+requests
+python-multipart
+matplotlib
