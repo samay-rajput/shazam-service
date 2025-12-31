@@ -1,37 +1,37 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import tempfile, os, subprocess
 from fastapi.params import Form
+import tempfile, os, subprocess
+
 from time_offset_approach.db.match_from_db import identify_song
 from time_offset_approach.db.db import songs_col
 from time_offset_approach.db.index_to_db import index_song
-from time_offset_approach.integrations.spotify_search import search_spotify , parse_spotify_results
+from time_offset_approach.integrations.spotify_search import search_spotify, parse_spotify_results
 
 app = FastAPI()
 
 # Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=["*"],  # In production, restrict to your frontend domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
 
 @app.post("/identify")
 async def identify(file: UploadFile = File(...)):
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded")
+    
+    MAX_FILE_SIZE = 13 * 1024 * 1024  # 13 MB hard limit
 
-    MAX_FILE_SIZE = 8 * 1024 * 1024  # 8 MB hard limit
-
-
-    # read file with size limit
+    # read file once
     contents = await file.read()
     if len(contents) > MAX_FILE_SIZE:
         raise HTTPException(status_code=413, detail="Audio file too large")
@@ -41,11 +41,8 @@ async def identify(file: UploadFile = File(...)):
 
     try:
         # save to /tmp explicitly (important on Render)
-        with tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=file.filename,
-            dir="/tmp"
-        ) as tmp:
+        suffix = os.path.splitext(file.filename)[1] or ".bin"
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, dir="/tmp") as tmp:
             tmp_path = tmp.name
             tmp.write(contents)
 
@@ -68,7 +65,7 @@ async def identify(file: UploadFile = File(...)):
         song_id, votes, status = identify_song(wav_path)
 
     finally:
-        # defensive cleanup (never crash here)
+        # defensive cleanup
         for p in (tmp_path, wav_path):
             if p and os.path.exists(p):
                 try:
@@ -102,20 +99,24 @@ async def upload_song(
     artist_name is optional for backward compatibility.
     """
 
-    #basic validations
+    # basic validations
     if not file.filename:
         raise HTTPException(status_code=400, detail="No audio file uploaded")
 
     if not song_title.strip():
         raise HTTPException(status_code=400, detail="song_title is required")
-    
+
     # Normalize values
     song_title = song_title.strip()
     artist_name = artist_name.strip() if artist_name else None
 
-    #get the metadata from spotify
-    data = search_spotify(song_title + " " + artist_name)
+    # build query safely
+    query = song_title if not artist_name else f"{song_title} {artist_name}"
+    data = search_spotify(query)
     song_metadata = parse_spotify_results(data)
+
+    if not song_metadata:
+        raise HTTPException(status_code=404, detail="No Spotify match found")
 
     song_id = song_metadata[0]['id']
     spotify_url = f"https://open.spotify.com/track/{song_id}"
@@ -125,48 +126,54 @@ async def upload_song(
     album_url = f"https://open.spotify.com/album/{song_metadata[0]['album_id']}"
     artists = song_metadata[0]['artists']
 
-    #duplicate check
-    existing_song = songs_col.find_one({ "song_id": song_id })
+    # duplicate check
+    existing_song = songs_col.find_one({"song_id": song_id})
     if existing_song:
         raise HTTPException(
             status_code=409,
             detail="Song already exists in database"
         )
 
-    #saving uploaded file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=file.filename, dir="/tmp") as tmp:
-        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
-        
-        if len(contents) > MAX_FILE_SIZE:
-            raise HTTPException(413, "File too large")
-        tmp_path = tmp.name
-        tmp.write(await file.read())
+    # saving uploaded file
+    contents = await file.read()
+    MAX_FILE_SIZE = 13 * 1024 * 1024  # 13 MB
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(413, "File too large")
 
-    #to .wav
-    wav_path = tmp_path + ".wav"
-    subprocess.run(
-        ["ffmpeg", "-y", "-i", tmp_path, "-ac", "1", "-ar", "22050", wav_path],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+    tmp_path = None
+    wav_path = None
 
-    #storing fingerprint!
     try:
+        suffix = os.path.splitext(file.filename)[1] or ".bin"
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, dir="/tmp") as tmp:
+            tmp_path = tmp.name
+            tmp.write(contents)
+
+        # to .wav
+        wav_path = tmp_path + ".wav"
+        subprocess.run(
+            ["ffmpeg", "-y", "-i", tmp_path, "-ac", "1", "-ar", "22050", wav_path],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True
+        )
+
+        # storing fingerprint
         index_song(wav_path, song_id)
 
-        # Store metadata (artist may be None)
+        # Store metadata
         songs_col.insert_one({
             "song_id": song_id,
             "title": song_name,
             "artist": artists,
             "spotify_url": spotify_url,
-            "cover_art" : cover_art, 
-            "album_url": album_url,  
+            "cover_art": cover_art,
+            "album_url": album_url,
             "album_name": album_name
         })
 
     finally:
-        #cleanup
+        # cleanup
         for p in (tmp_path, wav_path):
             if p and os.path.exists(p):
                 try:
@@ -174,9 +181,9 @@ async def upload_song(
                 except Exception:
                     pass
 
-    #response
+    # response
     return {
         "status": "indexed",
-        "song_title":song_name,
+        "song_title": song_name,
         "artists": artists
     }
